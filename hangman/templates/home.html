@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+        .flash-message{
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+
+    {% if title %}
+        <title>Hangman- {{ title }}</title>
+    {% else %}
+        <title>Hangman</title>
+    {% endif %}
+</head>
+<body>
+    <audio id="bgm" autoplay loop> 
+        <source src="{{ url_for('static', filename='audio/bgm.mp3') }}" type="audio/mpeg"> 
+        Your browser does not support the audio element. 
+    </audio>
+    <header class="site-header">
+        <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+            <div class="container">
+                <a class="navbar-brand mr-4" href="/">Hangman</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarToggle">
+                    <div class="navbar-nav mr-auto">
+                        <a class="nav-item nav-link" href="{{ url_for('user.home') }}">Home</a>
+                        <a class="nav-item nav-link" href="{{ url_for('user.rules') }}">Rules</a>
+                    </div>
+                    <!-- Navbar Right Side -->
+                    <div class="navbar-nav ml-auto">
+                        <a href="/profile" class="user-account d-flex align-items-center mb-3"> 
+                            <img src="{{ url_for('static',filename='profile_pics/'+ current_user.picture) }}" class="rounded-circle" alt="User Avatar" width="75" height="75"> 
+                            <span class="ml-2">{{ current_user.username }}</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main role="main" class="container mt-5 pt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} flash-message">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                <div class="container d-flex flex-column align-items-center">
+                    <!-- Hangman drawing -->
+                    <svg class="hangman mb-3" width="200" height="250">
+                        <!-- Gallows -->
+                        <line class="part" x1="50" y1="200" x2="150" y2="200" stroke="black" stroke-width="5"/>
+                        <line class="part" x1="100" y1="50" x2="100" y2="200" stroke="black" stroke-width="5"/>
+                        <line class="part" x1="100" y1="50" x2="150" y2="50" stroke="black" stroke-width="5"/>
+                        <line class="part" x1="150" y1="50" x2="150" y2="80" stroke="black" stroke-width="5"/>
+                        <!-- Hangman -->
+                        <circle class="part" cx="150" cy="100" r="20" stroke="black" stroke-width="3" fill="none"/>
+                        <line class="part" x1="150" y1="120" x2="150" y2="160" stroke="black" stroke-width="3"/>
+                        <line class="part" x1="150" y1="130" x2="130" y2="150" stroke="black" stroke-width="3"/>
+                        <line class="part" x1="150" y1="130" x2="170" y2="150" stroke="black" stroke-width="3"/>
+                        <line class="part" x1="150" y1="160" x2="130" y2="190" stroke="black" stroke-width="3"/>
+                        <line class="part" x1="150" y1="160" x2="170" y2="190" stroke="black" stroke-width="3"/>
+                    </svg>
+                    <!-- Play button -->
+                    <button class="btn btn-success play-button mt-3" onclick="window.location.href='/play'">Play</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <script>
+        function animateHangman() {
+            const parts = document.querySelectorAll('.hangman .part');
+            let delay = 0;
+            parts.forEach(part => {
+                setTimeout(() => {
+                    part.style.opacity = 1;
+                }, delay);
+                delay += 500;  // Reduce delay to 500ms between each part
+            });
+            setTimeout(() => {
+                parts.forEach(part => {
+                    part.style.opacity = 0;
+                });
+                animateHangman();
+            }, delay);
+        }
+
+        animateHangman();
+    </script>
+    <script>setTimeout(function() { 
+    const flashMessages = document.querySelectorAll('.flash-message'); 
+    flashMessages.forEach(function(message) { 
+    message.style.display = 'none'; 
+    }); 
+    }, 
+    5000); // 5000 milliseconds = 5 seconds 
+    </script>
+    <script> 
+    document.addEventListener('DOMContentLoaded', () => { 
+        const bgm = document.getElementById('bgm');  
+        const bgmMuted = localStorage.getItem('bgmMuted'); 
+        if (bgmMuted === 'true') { 
+            bgm.muted = true; 
+        } 
+        else { 
+            bgm.muted = false; 
+        }
+    });
+</script>
+</body>
+</html>
+

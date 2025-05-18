@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<audio id="bgm" autoplay loop> 
+    <source src="{{ url_for('static', filename='audio/bgm.mp3') }}" type="audio/mpeg"> 
+    Your browser does not support the audio element. 
+</audio>
+<h1>Hangman Game Rules</h1> 
+<h2>Overview</h2> 
+<p>Hangman is a classic word guessing game where players try to guess a hidden word by suggesting letters within a certain number of guesses.</p> 
+<h2>How to Play</h2> 
+<ol> 
+    <li>One player thinks of a word and writes down a series of dashes, representing each letter of the word. Alternatively, a random word generator can be used.</li> 
+    <li>The other player (or players) will guess letters one at a time.</li> 
+    <li>If the guessed letter is in the word, the first player writes the letter in all its correct positions. If the guessed letter is not in the word, the first player draws one part of the hangman diagram.</li> 
+    <li>The hangman diagram typically consists of the following parts: base, post, crossbeam, rope, head, body, left arm, right arm, left leg, right leg.</li> 
+    <li>The game continues with players guessing letters until they either guess the complete word correctly or the hangman diagram is fully drawn (indicating a loss).</li> 
+</ol> 
+<h2>Rules</h2> 
+<ul> 
+    <li>Players must guess one letter at a time.</li> 
+    <li>If the same incorrect letter is guessed more than once, it does not count as an additional incorrect guess.</li> 
+    <li>The game ends when the entire word is guessed correctly or when the hangman diagram is fully drawn.</li> 
+</ul> 
+<h2>Winning and Losing</h2> 
+<p>The player wins if they can guess the entire word before the hangman diagram is completed. The player loses if the hangman diagram is fully drawn before the word is guessed.</p>
+<div class="border-top pt-3">
+    <small class="text-muted">
+        Register to play now! <a class="ml-2" href="{{ url_for('user.register') }}">Play Now</a>
+    </small>
+</div>
+<script> 
+    document.addEventListener('DOMContentLoaded', () => { 
+        const bgm = document.getElementById('bgm');  
+        const bgmMuted = localStorage.getItem('bgmMuted'); 
+        if (bgmMuted === 'true') { 
+            bgm.muted = true; 
+        } 
+        else { 
+            bgm.muted = false; 
+        }
+    });
+</script>
+{% endblock %}
